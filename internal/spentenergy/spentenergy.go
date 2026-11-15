@@ -1,6 +1,7 @@
 package spentenergy
 
 import (
+	"errors"
 	"time"
 )
 
@@ -12,18 +13,58 @@ const (
 	walkingCaloriesCoefficient = 0.5  // коэффициент для расчета калорий при ходьбе.
 )
 
+// WalkingSpentCalories рассчитывает количество калорий, потраченных при ходьбе.
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
-	// TODO: реализовать функцию
+	if steps <= 0 {
+		return 0, errors.New("количество шагов должно быть положительным")
+	}
+	if weight <= 0 {
+		return 0, errors.New("вес должен быть положительным")
+	}
+	if height <= 0 {
+		return 0, errors.New("рост должен быть положительным")
+	}
+	if duration <= 0 {
+		return 0, errors.New("продолжительность должна быть положительной")
+	}
+
+	meanSpeed := MeanSpeed(steps, height, duration)
+	durationInMinutes := duration.Minutes()
+	calories := weight * meanSpeed * durationInMinutes / minInH
+	return calories * walkingCaloriesCoefficient, nil
 }
 
+// RunningSpentCalories рассчитывает количество калорий, потраченных при беге.
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
-	// TODO: реализовать функцию
+	if steps <= 0 {
+		return 0, errors.New("количество шагов должно быть положительным")
+	}
+	if weight <= 0 {
+		return 0, errors.New("вес должен быть положительным")
+	}
+	if height <= 0 {
+		return 0, errors.New("рост должен быть положительным")
+	}
+	if duration <= 0 {
+		return 0, errors.New("продолжительность должна быть положительной")
+	}
+
+	meanSpeed := MeanSpeed(steps, height, duration)
+	durationInMinutes := duration.Minutes()
+	calories := weight * meanSpeed * durationInMinutes / minInH
+	return calories, nil
 }
 
+// MeanSpeed возвращает среднюю скорость в километрах в час.
 func MeanSpeed(steps int, height float64, duration time.Duration) float64 {
-	// TODO: реализовать функцию
+	if duration <= 0 || steps < 0 {
+		return 0
+	}
+	return Distance(steps, height) / duration.Hours()
 }
 
+// Distance возвращает пройденное расстояние в километрах.
 func Distance(steps int, height float64) float64 {
-	// TODO: реализовать функцию
+	stepLength := height * stepLengthCoefficient
+	return float64(steps) * stepLength / mInKm
 }
